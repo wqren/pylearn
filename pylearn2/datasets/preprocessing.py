@@ -136,13 +136,14 @@ class ReassembleGridPatches(object):
                                )
             num_examples /= patches_this_dim
 
-        # batch size
+        # batch size, 这里计算出图片数目
         reassembled_shape = [num_examples]
         # topological dimensions
         for dim in self.orig_shape:
             reassembled_shape.append(dim)
         # number of channels
         reassembled_shape.append(patches.shape[-1])
+        # reassembled_shape = [图片数目(batch_size) width方向采样数 height方向采样数 channels数目]
         reassembled = np.zeros(reassembled_shape, dtype=patches.dtype)
         channel_slice = slice(0, patches.shape[-1])
         coords = [0] * (num_topological_dimensions + 1)
