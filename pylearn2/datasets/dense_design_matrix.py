@@ -483,6 +483,9 @@ class DefaultViewConverter(object):
         return self.design_mat_to_topo_view(X)
 
     def topo_view_to_design_mat(self, V):
+        #实现拓扑视图到设计矩阵的转换
+        # self.shape = [view_width view_height num_channels]
+        # V.shape = [batch_size view_width, view_height, num_channels]
         #num_channels 
         num_channels = self.shape[-1]
         if N.any(N.asarray(self.shape) != N.asarray(V.shape[1:])):
