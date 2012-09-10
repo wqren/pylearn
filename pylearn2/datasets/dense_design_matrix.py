@@ -452,12 +452,17 @@ class DefaultViewConverter(object):
         return self.shape
 
     def design_mat_to_topo_view(self, X):
+        # 该函数实现从设计矩阵到拓扑视图的转换
+        # self.shape = [width, height, num_channel]
+        # self.pixels_per_channel 代表图像每个通道的像素数目
+        # channel_shape = [batch_size(图片数目) width height num_channel]
         assert len(X.shape) == 2
         batch_size = X.shape[0]
         channel_shape = [batch_size]
         for dim in self.shape[:-1]:
             channel_shape.append(dim)
         channel_shape.append(1)
+        # 确保转换不改变总像素数目
         if self.shape[-1] * self.pixels_per_channel != X.shape[1]:
             raise ValueError('View converter with ' + str(self.shape[-1]) +
                              ' channels and ' + str(self.pixels_per_channel) +
@@ -465,6 +470,7 @@ class DefaultViewConverter(object):
                              ' matrix with ' + str(X.shape[1]) + ' columns.')
         start = lambda i: self.pixels_per_channel * i
         stop = lambda i: self.pixels_per_channel * (i + 1)
+        #依次取出各个通道，并转换形状
         channels = [X[:, start(i):stop(i)].reshape(*channel_shape)
                     for i in xrange(self.shape[-1])]
 
@@ -477,6 +483,7 @@ class DefaultViewConverter(object):
         return self.design_mat_to_topo_view(X)
 
     def topo_view_to_design_mat(self, V):
+        #num_channels 
         num_channels = self.shape[-1]
         if N.any(N.asarray(self.shape) != N.asarray(V.shape[1:])):
             raise ValueError('View converter for views of shape batch size '
