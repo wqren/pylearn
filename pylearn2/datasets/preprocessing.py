@@ -33,7 +33,9 @@ class ExtractGridPatches(object):
         self.patch_stride = patch_stride
 
     def apply(self, dataset, can_fit=False):
+        # X.shape = [图片数目 宽度 高度 通道数]
         X = dataset.get_topological_view()
+        # 拓扑维度 是去除图片数目和通道数后的维度数目， 提取patch是操作在这个维度上
         num_topological_dimensions = len(X.shape) - 2
         if num_topological_dimensions != len(self.patch_shape):
             raise ValueError("ExtractGridPatches with "
@@ -41,6 +43,8 @@ class ExtractGridPatches(object):
                              + " topological dimensions called on"
                              + " dataset with " +
                              str(num_topological_dimensions) + ".")
+        # num_patches = 图片数目（X.shape[0]）* num_strides_topo_axis_0 * num_strides_topo_axis_1 * num_channel
+        # num_strides_this_axis = (image_width - patch_width)/stride + 1
         num_patches = X.shape[0]
         max_strides = [X.shape[0] - 1]
         for i in xrange(num_topological_dimensions):
@@ -67,6 +71,7 @@ class ExtractGridPatches(object):
             output_shape.append(dim)
         # number of channels
         output_shape.append(X.shape[-1])
+        # output_shape = [batch_size topo_dim0 topo_dim1 num_channel]
         output = np.zeros(output_shape, dtype=X.dtype)
         channel_slice = slice(0, X.shape[-1])
         coords = [0] * (num_topological_dimensions + 1)
